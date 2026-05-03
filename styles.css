@@ -1,0 +1,617 @@
+/* ==========================================================================
+   Impostor Musical — estilos
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #f5f0ff;
+  background: radial-gradient(ellipse at top, #2a0a4d 0%, #0b0118 50%, #050008 100%);
+  background-attachment: fixed;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  position: relative;
+}
+
+/* ----- Pantallas ---------------------------------------------------------- */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  padding: max(env(safe-area-inset-top), 16px) 20px max(env(safe-area-inset-bottom), 16px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: fadeIn 0.3s ease;
+}
+
+.screen.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ----- Encabezado --------------------------------------------------------- */
+.hero {
+  text-align: center;
+  margin: 16px 0 24px;
+}
+.hero-small { margin: 8px 0 16px; }
+
+.hero h1 {
+  font-size: 28px;
+  margin: 0 0 8px;
+  background: linear-gradient(90deg, #ff5cd9, #7e5cff, #5ce1ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.hero h2 {
+  font-size: 22px;
+  margin: 0 0 6px;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.footnote {
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.5;
+  padding: 16px 0;
+}
+
+/* ----- Tarjeta principal -------------------------------------------------- */
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ----- Campos / inputs ---------------------------------------------------- */
+.field {
+  display: block;
+  margin-bottom: 18px;
+}
+
+.field > span {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  opacity: 0.85;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.stepper input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 0;
+  font-family: inherit;
+  -moz-appearance: textfield;
+}
+.stepper input::-webkit-outer-spin-button,
+.stepper input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.step-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.step-btn:active { background: rgba(255, 255, 255, 0.18); }
+
+.names-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.names-list input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #fff;
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.names-list input:focus {
+  border-color: #7e5cff;
+}
+.names-list input::placeholder { opacity: 0.4; }
+
+/* ----- Botones ------------------------------------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 14px;
+  padding: 14px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.1s ease, opacity 0.2s, background 0.2s;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff5cd9, #7e5cff);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(126, 92, 255, 0.35);
+}
+.btn-primary:disabled { box-shadow: none; }
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.btn-block {
+  display: flex;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.btn-floating {
+  position: sticky;
+  bottom: 16px;
+  margin: 16px 20px 0;
+  align-self: stretch;
+}
+
+.error {
+  color: #ff7a8a;
+  font-size: 13px;
+  margin: 12px 0 0;
+  text-align: center;
+}
+
+/* ----- Pase de móvil ------------------------------------------------------ */
+.pass-card {
+  margin: auto;
+  text-align: center;
+  width: 100%;
+  max-width: 360px;
+  padding: 32px 24px;
+}
+
+.pass-instruction {
+  font-size: 16px;
+  opacity: 0.7;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pass-name {
+  font-size: 40px;
+  margin: 0 0 8px;
+  background: linear-gradient(135deg, #ff5cd9, #7e5cff, #5ce1ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+  word-break: break-word;
+}
+
+.pass-progress {
+  font-size: 14px;
+  opacity: 0.5;
+  margin: 0 0 32px;
+}
+
+/* ----- Reveal (con tarjeta deslizable) ----------------------------------- */
+#screen-reveal {
+  padding: 0;
+}
+
+.reveal-stage {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  margin: 16px;
+  border-radius: 24px;
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.reveal-back {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+}
+
+.reveal-content {
+  width: 100%;
+  max-width: 360px;
+}
+
+.reveal-content .role-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  margin-bottom: 12px;
+}
+
+.reveal-content .role-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.reveal-content.civil .role-title {
+  background: linear-gradient(135deg, #5ce1ff, #7e5cff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.reveal-content.impostor .role-title {
+  background: linear-gradient(135deg, #ff5c8a, #ffba5c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.reveal-content .song-emoji {
+  font-size: 64px;
+  margin-bottom: 12px;
+}
+
+.reveal-content .song-title {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+
+.reveal-content .song-artist {
+  font-size: 16px;
+  opacity: 0.75;
+  margin: 0 0 20px;
+}
+
+.reveal-content .impostor-msg {
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.85;
+  margin: 0 0 12px;
+}
+
+.reveal-hint {
+  position: absolute;
+  bottom: 18px;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.45;
+  margin: 0;
+}
+
+.reveal-front {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(160deg, #2a0a4d 0%, #4a1a8d 60%, #ff5cd9 200%);
+  border-radius: 24px;
+  padding: 24px;
+  cursor: grab;
+  touch-action: none;
+  will-change: transform;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+}
+.reveal-front.dragging { transition: none; cursor: grabbing; }
+.reveal-front.revealed { transform: translateY(-100%); }
+
+.reveal-handle {
+  width: 60px;
+  height: 5px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.4);
+  margin-bottom: 36px;
+}
+
+.reveal-front-name {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 12px;
+  word-break: break-word;
+}
+
+.reveal-front-text {
+  font-size: 18px;
+  margin: 0 0 24px;
+  line-height: 1.5;
+  opacity: 0.92;
+}
+
+.reveal-arrow {
+  font-size: 36px;
+  animation: bounce 1.4s ease infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-12px); opacity: 1; }
+}
+
+/* ----- Pantalla "listos para bailar" ------------------------------------ */
+.ready-card {
+  margin: auto;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  padding: 24px 8px;
+}
+.ready-card h2 {
+  font-size: 30px;
+  margin: 0 0 12px;
+}
+.ready-card > p {
+  font-size: 16px;
+  opacity: 0.85;
+  margin: 0 0 20px;
+}
+.rules {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  text-align: left;
+}
+.rules li {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+/* ----- Temporizador ------------------------------------------------------- */
+.timer-stage {
+  margin: auto;
+  text-align: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+.timer-label {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  opacity: 0.7;
+  margin: 0 0 16px;
+}
+
+.timer-display {
+  font-size: 96px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(135deg, #ff5cd9, #7e5cff, #5ce1ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  line-height: 1;
+  margin-bottom: 24px;
+}
+.timer-display.warning {
+  background: linear-gradient(135deg, #ffba5c, #ff5c8a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: pulse 0.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  50% { transform: scale(1.05); }
+}
+
+.timer-progress {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #5ce1ff, #7e5cff, #ff5cd9);
+  transition: width 1s linear;
+}
+
+.timer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ----- Votación ----------------------------------------------------------- */
+.vote-instructions {
+  text-align: center;
+  opacity: 0.8;
+  margin: 0 0 16px;
+}
+
+.vote-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.vote-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 18px 12px;
+  text-align: center;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.1s, background 0.15s, border-color 0.15s;
+  word-break: break-word;
+}
+.vote-btn:active {
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.vote-result {
+  text-align: center;
+  margin-top: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+.vote-result-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 28px 20px;
+  margin-bottom: 16px;
+}
+
+.vote-result-card.civil {
+  background: linear-gradient(160deg, rgba(92, 225, 255, 0.18), rgba(126, 92, 255, 0.12));
+  border-color: rgba(92, 225, 255, 0.45);
+}
+.vote-result-card.impostor {
+  background: linear-gradient(160deg, rgba(255, 92, 138, 0.22), rgba(255, 186, 92, 0.14));
+  border-color: rgba(255, 92, 138, 0.5);
+}
+
+#vote-result-text {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+
+.vote-result-detail {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ----- Pantalla final ----------------------------------------------------- */
+.end-card {
+  margin: auto;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  padding: 16px 8px;
+}
+.end-emoji {
+  font-size: 72px;
+  margin-bottom: 12px;
+}
+.end-card h2 {
+  font-size: 30px;
+  margin: 0 0 8px;
+}
+.end-detail {
+  margin: 0 0 20px;
+  opacity: 0.8;
+}
+.end-summary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+.end-summary .summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+.end-summary .summary-row + .summary-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.end-summary .badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-weight: 700;
+}
+.badge.civil { background: rgba(92, 225, 255, 0.2); color: #c4f0ff; }
+.badge.impostor { background: rgba(255, 92, 138, 0.25); color: #ffd0db; }
+.badge.alive { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.badge.eliminated { background: rgba(0, 0, 0, 0.3); color: #999; text-decoration: line-through; }

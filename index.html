@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0118" />
+  <title>Impostor Musical</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app">
+    <!-- 1. PANTALLA DE CONFIGURACIÓN -->
+    <section class="screen active" id="screen-setup">
+      <header class="hero">
+        <h1>🎵 Impostor Musical 🕵️</h1>
+        <p class="subtitle">Encuentra al impostor en la pista de baile</p>
+      </header>
+
+      <div class="card">
+        <label class="field">
+          <span>Número de jugadores</span>
+          <div class="stepper" data-stepper="players">
+            <button type="button" class="step-btn" data-step="-1">−</button>
+            <input id="input-players" type="number" min="3" max="20" value="4" inputmode="numeric" />
+            <button type="button" class="step-btn" data-step="1">+</button>
+          </div>
+        </label>
+
+        <label class="field">
+          <span>Número de impostores</span>
+          <div class="stepper" data-stepper="impostors">
+            <button type="button" class="step-btn" data-step="-1">−</button>
+            <input id="input-impostors" type="number" min="1" max="5" value="1" inputmode="numeric" />
+            <button type="button" class="step-btn" data-step="1">+</button>
+          </div>
+        </label>
+
+        <label class="field">
+          <span>Duración de la ronda (segundos)</span>
+          <div class="stepper" data-stepper="duration">
+            <button type="button" class="step-btn" data-step="-15">−</button>
+            <input id="input-duration" type="number" min="15" max="300" step="15" value="60" inputmode="numeric" />
+            <button type="button" class="step-btn" data-step="15">+</button>
+          </div>
+        </label>
+
+        <div class="field">
+          <span>Nombres</span>
+          <div id="names-list" class="names-list"></div>
+        </div>
+
+        <button id="btn-start" class="btn btn-primary btn-block">Empezar partida</button>
+        <p id="setup-error" class="error" hidden></p>
+      </div>
+
+      <footer class="footnote">
+        Pasa el móvil de jugador en jugador. Cada uno deslizará para descubrir su canción secreta.
+      </footer>
+    </section>
+
+    <!-- 2. PANTALLA DE PASE / "DAME EL MÓVIL" -->
+    <section class="screen" id="screen-pass">
+      <div class="pass-card">
+        <p class="pass-instruction">Pasa el móvil a</p>
+        <h2 id="pass-name" class="pass-name">—</h2>
+        <p class="pass-progress" id="pass-progress">Jugador 1 de 4</p>
+        <button id="btn-im-here" class="btn btn-primary btn-block">Soy yo, dame el móvil</button>
+      </div>
+    </section>
+
+    <!-- 3. PANTALLA DE REVELACIÓN (con swipe) -->
+    <section class="screen" id="screen-reveal">
+      <div class="reveal-stage">
+        <!-- Contenido oculto debajo -->
+        <div class="reveal-back" id="reveal-back">
+          <div class="reveal-content" id="reveal-content">
+            <!-- relleno dinámico -->
+          </div>
+          <p class="reveal-hint">Desliza la tarjeta hacia abajo para ocultar</p>
+        </div>
+
+        <!-- Tarjeta deslizable -->
+        <div class="reveal-front" id="reveal-front">
+          <div class="reveal-handle"></div>
+          <p class="reveal-front-name" id="reveal-front-name">—</p>
+          <p class="reveal-front-text">Desliza hacia arriba<br>para ver tu secreto</p>
+          <div class="reveal-arrow">⬆️</div>
+        </div>
+      </div>
+
+      <button id="btn-next-player" class="btn btn-primary btn-block btn-floating" disabled>Siguiente jugador</button>
+    </section>
+
+    <!-- 4. PANTALLA DE INICIO DE BAILE -->
+    <section class="screen" id="screen-ready">
+      <div class="ready-card">
+        <h2>¡Todos listos!</h2>
+        <p>Buscad la canción en vuestro móvil, poneos los auriculares y… 💃🕺</p>
+        <ul class="rules">
+          <li>🎧 Civiles: bailad <strong>vuestra canción secreta</strong>.</li>
+          <li>🤫 Impostores: poned cualquier canción y disimulad.</li>
+          <li>👀 Observad a los demás. ¿Quién baila raro?</li>
+        </ul>
+        <button id="btn-start-timer" class="btn btn-primary btn-block">Empezar a bailar</button>
+      </div>
+    </section>
+
+    <!-- 5. PANTALLA DE TEMPORIZADOR -->
+    <section class="screen" id="screen-timer">
+      <div class="timer-stage">
+        <p class="timer-label">¡A bailar!</p>
+        <div id="timer-display" class="timer-display">01:00</div>
+        <div class="timer-progress">
+          <div id="timer-bar" class="timer-bar"></div>
+        </div>
+        <div class="timer-actions">
+          <button id="btn-timer-toggle" class="btn btn-secondary">Pausar</button>
+          <button id="btn-timer-skip" class="btn btn-ghost">Saltar a votación</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. PANTALLA DE ACUSACIÓN -->
+    <section class="screen" id="screen-vote">
+      <header class="hero hero-small">
+        <h2>Ronda de acusaciones</h2>
+        <p class="subtitle" id="vote-status">Quedan 3 civiles y 1 impostor</p>
+      </header>
+
+      <p class="vote-instructions">Discute con el grupo y elige a quién linchar:</p>
+      <div id="vote-list" class="vote-list"></div>
+
+      <div id="vote-result" class="vote-result" hidden>
+        <div id="vote-result-card" class="vote-result-card">
+          <p id="vote-result-text"></p>
+          <p id="vote-result-detail" class="vote-result-detail"></p>
+        </div>
+        <button id="btn-vote-continue" class="btn btn-primary btn-block">Continuar</button>
+      </div>
+    </section>
+
+    <!-- 7. PANTALLA DE FIN -->
+    <section class="screen" id="screen-end">
+      <div class="end-card">
+        <div id="end-emoji" class="end-emoji">🎉</div>
+        <h2 id="end-title">¡Ganan los civiles!</h2>
+        <p id="end-detail" class="end-detail"></p>
+        <div class="end-summary" id="end-summary"></div>
+        <button id="btn-play-again" class="btn btn-primary btn-block">Jugar otra vez</button>
+        <button id="btn-new-game" class="btn btn-ghost btn-block">Configurar nueva partida</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="songs.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
