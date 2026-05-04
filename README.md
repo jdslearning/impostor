@@ -84,23 +84,25 @@ jugador. Puedes:
 
 ## 🎵 Editor de canciones
 
-La app trae 50 canciones bailables por defecto. Si quieres usar las tuyas:
+La app trae unas cuantas canciones bailables por defecto (en `songs.txt`).
+Si quieres usar las tuyas:
 
-1. En la pantalla de configuración, pulsa el icono **🎵** del pie de página.
-2. Introduce la contraseña: `clarasobrado`.
-3. Verás el editor:
-   - **Añadir canción** (emoji, título, artista).
-   - Editar o borrar cualquiera de la lista.
-   - **Guardar** los cambios (se guardan en este dispositivo).
-   - **Restaurar por defecto** para volver a la lista original.
-   - **Exportar** la lista como JSON (descarga un archivo).
-   - **Importar** un JSON exportado previamente.
+1. En la pantalla de configuración, pulsa **✏️ Editar canciones**.
+2. Verás un cuadro de texto con la lista, una canción por línea.
+3. Añade, edita o borra líneas en el formato:
+
+   ```
+   Título - Artista
+   ```
+
+4. Pulsa **Guardar** para que la app use tu lista en las próximas
+   partidas (se guarda en este dispositivo).
+5. Si te lías o quieres volver a la lista original, pulsa
+   **Restaurar lista por defecto**.
 
 > **Almacenamiento local**: las canciones personalizadas se guardan en el
 > `localStorage` del navegador del dispositivo donde uses la app. Si juegas
 > desde otro móvil, la lista vuelve a ser la de por defecto.
-> Para sincronizar entre dispositivos, usa **Exportar** en uno e
-> **Importar** en otro.
 
 ---
 
@@ -128,7 +130,7 @@ Estructura del proyecto:
 ├── app.js                  # Lógica del juego
 ├── editor.html             # Editor de canciones (acceso protegido)
 ├── editor.js               # Lógica del editor
-├── songs.js                # Catálogo de canciones por defecto
+├── songs.txt               # Catálogo de canciones por defecto
 ├── styles.css              # Estilos compartidos
 ├── icon.svg                # Icono (favicon + PWA)
 ├── manifest.webmanifest    # Manifest PWA
