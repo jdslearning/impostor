@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2a0a4d" />
+  <title>Editor de canciones · Impostor Musical</title>
+
+  <link rel="icon" type="image/png" href="icon-1024.png" />
+  <link rel="apple-touch-icon" href="icon-1024.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="editor-page">
+  <main id="app">
+    <!-- 1. Pantalla de contraseña -->
+    <section class="screen active" id="screen-lock">
+      <form id="lock-form" class="card lock-card" autocomplete="off">
+        <div class="lock-emoji">🔒</div>
+        <h1>Editor de canciones</h1>
+        <p>Introduce la contraseña para entrar.</p>
+        <input id="lock-input" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="••••••" />
+        <p id="lock-error" class="error" hidden>Contraseña incorrecta.</p>
+        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        <a href="index.html" class="btn btn-ghost btn-block">Volver al juego</a>
+      </form>
+    </section>
+
+    <!-- 2. Editor -->
+    <section class="screen" id="screen-editor">
+      <header class="editor-header">
+        <h1>🎵 Canciones</h1>
+        <a href="index.html" class="back-link">← Volver</a>
+      </header>
+
+      <p id="editor-status" class="editor-status">—</p>
+
+      <div class="editor-toolbar">
+        <button id="btn-save" class="btn btn-primary">Guardar</button>
+        <button id="btn-restore" class="btn btn-secondary">Restaurar por defecto</button>
+        <button id="btn-export" class="btn btn-ghost">Exportar</button>
+        <button id="btn-import" class="btn btn-ghost">Importar</button>
+        <input id="file-import" type="file" accept="application/json" hidden />
+      </div>
+
+      <div class="editor-add">
+        <h3>Añadir canción</h3>
+        <div class="row">
+          <input id="add-emoji" type="text" maxlength="4" placeholder="🎵" />
+          <input id="add-title" type="text" maxlength="60" placeholder="Título" />
+        </div>
+        <div class="row row-full">
+          <input id="add-artist" type="text" maxlength="60" placeholder="Artista" />
+        </div>
+        <button id="btn-add" type="button" class="btn btn-primary btn-block">Añadir</button>
+      </div>
+
+      <ul id="song-list" class="song-list" aria-label="Lista de canciones"></ul>
+    </section>
+  </main>
+
+  <script src="songs.js"></script>
+  <script src="editor.js"></script>
+</body>
+</html>
