@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-title" content="Impostor" />
   <meta name="mobile-web-app-capable" content="yes" />
 
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body>
   <main id="app">
@@ -68,24 +68,16 @@
       </footer>
     </section>
 
-    <!-- 2. PANTALLA DE PASE / "DAME EL MÓVIL" -->
-    <section class="screen" id="screen-pass">
-      <div class="pass-card">
-        <p class="pass-instruction">Pasa el móvil a</p>
-        <h2 id="pass-name" class="pass-name">—</h2>
-        <p class="pass-progress" id="pass-progress">Jugador 1 de 4</p>
-        <button id="btn-im-here" class="btn btn-primary btn-block">Soy yo, dame el móvil</button>
-      </div>
-    </section>
-
-    <!-- 3. PANTALLA DE REVELACIÓN (tarjeta que gira) -->
+    <!-- PANTALLA DE REVELACIÓN (tarjeta que gira) -->
     <section class="screen" id="screen-reveal">
+      <p id="reveal-progress" class="reveal-progress">Jugador 1 de 4</p>
       <div class="reveal-stage">
         <div class="flip-card" id="flip-card" role="button" tabindex="0" aria-label="Tocar para girar la tarjeta">
           <div class="flip-inner">
             <div class="flip-face flip-front">
-              <p class="flip-tap">Toca tu nombre para ver el secreto</p>
+              <p class="flip-prefix">¿Eres?</p>
               <h2 class="flip-name" id="flip-name">—</h2>
+              <p class="flip-tap">Toca tu nombre para ver el secreto</p>
               <div class="flip-icon">👆</div>
             </div>
             <div class="flip-face flip-back">
@@ -160,6 +152,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
