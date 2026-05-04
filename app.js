@@ -225,8 +225,8 @@
     // Barajamos el orden de reparto para que no coincida con el orden de la lista
     state.revealOrder = shuffle(state.players.map(p => p.id));
 
-    showScreen('screen-pass');
-    renderPass();
+    renderReveal();
+    showScreen('screen-reveal');
   }
 
   function setError(msg) {
@@ -246,47 +246,25 @@
     }
   }
 
-  // --- Fase de reparto ----------------------------------------------------
+  // --- Reveal con tarjeta que gira ---------------------------------------
+  const flipCard = $('#flip-card');
+  const flipName = $('#flip-name');
+  const revealContent = $('#reveal-content');
+  const revealProgress = $('#reveal-progress');
+  const btnNext = $('#btn-next-player');
+
+  // Duración del flip-back al pasar al siguiente jugador (en ms).
+  // Debe coincidir con la transición CSS de .flip-inner.
+  const FLIP_DURATION_MS = 700;
+
+  let cardLocked = false;
+
   function currentPlayer() {
     const id = state.revealOrder[state.revealIndex];
     return state.players.find(p => p.id === id);
   }
 
-  function renderPass() {
-    const player = currentPlayer();
-    $('#pass-name').textContent = player.name;
-    $('#pass-progress').textContent =
-      `Jugador ${state.revealIndex + 1} de ${state.players.length}`;
-    showScreen('screen-pass');
-  }
-
-  $('#btn-im-here').addEventListener('click', () => {
-    renderReveal();
-    showScreen('screen-reveal');
-  });
-
-  // --- Reveal con tarjeta que gira ---------------------------------------
-  const flipCard = $('#flip-card');
-  const flipName = $('#flip-name');
-  const revealContent = $('#reveal-content');
-  const btnNext = $('#btn-next-player');
-
-  let hasSeen = false;
-
-  function renderReveal() {
-    const player = currentPlayer();
-    flipName.textContent = player.name;
-
-    // Reset estado
-    flipCard.classList.remove('flipped');
-    hasSeen = false;
-    btnNext.disabled = true;
-    btnNext.textContent =
-      state.revealIndex === state.players.length - 1
-        ? 'Listo, empezar a jugar'
-        : 'Siguiente jugador';
-
-    // Contenido secreto
+  function setBackContent(player) {
     revealContent.classList.remove('civil', 'impostor');
     if (player.role === 'impostor') {
       revealContent.classList.add('impostor');
@@ -297,9 +275,7 @@
           No conoces la canción. Pon lo que quieras y trata de imitar
           a los demás bailarines.
         </p>
-        <p class="impostor-msg">
-          ¡Que no te pillen!
-        </p>
+        <p class="impostor-msg">¡Que no te pillen!</p>
       `;
     } else {
       revealContent.classList.add('civil');
@@ -313,6 +289,22 @@
     }
   }
 
+  // Render inicial (primer jugador, sin animación previa).
+  function renderReveal() {
+    const player = currentPlayer();
+    flipName.textContent = player.name;
+    revealProgress.textContent =
+      `Jugador ${state.revealIndex + 1} de ${state.players.length}`;
+    flipCard.classList.remove('flipped');
+    btnNext.disabled = true;
+    btnNext.textContent =
+      state.revealIndex === state.players.length - 1
+        ? 'Listo, empezar a jugar'
+        : 'Siguiente jugador';
+    setBackContent(player);
+    cardLocked = false;
+  }
+
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, c => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -320,12 +312,11 @@
   }
 
   function toggleFlip() {
+    if (cardLocked) return;
     const willBeFlipped = !flipCard.classList.contains('flipped');
     flipCard.classList.toggle('flipped', willBeFlipped);
     if (willBeFlipped) {
-      hasSeen = true;
-    } else if (hasSeen) {
-      // Vio el secreto y volvió a esconderlo: desbloquea "Siguiente"
+      // Ha visto su secreto: ya puede pasar al siguiente.
       btnNext.disabled = false;
     }
   }
@@ -342,8 +333,34 @@
     state.revealIndex++;
     if (state.revealIndex >= state.players.length) {
       showScreen('screen-ready');
+      return;
+    }
+
+    const player = currentPlayer();
+    const wasFlipped = flipCard.classList.contains('flipped');
+
+    // El nombre del frente lo cambiamos ya: queda oculto detrás durante el
+    // flip y aparece cuando termina la animación.
+    flipName.textContent = player.name;
+    revealProgress.textContent =
+      `Jugador ${state.revealIndex + 1} de ${state.players.length}`;
+    btnNext.disabled = true;
+    btnNext.textContent =
+      state.revealIndex === state.players.length - 1
+        ? 'Listo, empezar a jugar'
+        : 'Siguiente jugador';
+
+    if (wasFlipped) {
+      // Animamos la vuelta. Bloqueamos el toque para que el siguiente jugador
+      // no pueda re-girar antes de que actualicemos el contenido del reverso.
+      cardLocked = true;
+      flipCard.classList.remove('flipped');
+      setTimeout(() => {
+        setBackContent(player);
+        cardLocked = false;
+      }, FLIP_DURATION_MS);
     } else {
-      renderPass();
+      setBackContent(player);
     }
   });
 
@@ -566,7 +583,8 @@
     state.rounds = 0;
     state.revealOrder = shuffle(state.players.map(p => p.id));
 
-    renderPass();
+    renderReveal();
+    showScreen('screen-reveal');
   });
 
   $('#btn-new-game').addEventListener('click', () => {

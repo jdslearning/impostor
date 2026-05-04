@@ -254,43 +254,18 @@ html, body {
   40%, 60% { transform: translateX(6px); }
 }
 
-/* ----- Pase de móvil ------------------------------------------------------ */
-.pass-card {
-  margin: auto;
-  text-align: center;
-  width: 100%;
-  max-width: 360px;
-  padding: 32px 24px;
-}
-
-.pass-instruction {
-  font-size: 16px;
-  opacity: 0.7;
-  margin: 0 0 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.pass-name {
-  font-size: 40px;
-  margin: 0 0 8px;
-  background: linear-gradient(135deg, #ff5cd9, #7e5cff, #5ce1ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 800;
-  word-break: break-word;
-}
-
-.pass-progress {
-  font-size: 14px;
-  opacity: 0.5;
-  margin: 0 0 32px;
-}
-
 /* ----- Reveal (tarjeta que gira) ----------------------------------------- */
 #screen-reveal {
   padding: 0;
+}
+
+.reveal-progress {
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin: max(env(safe-area-inset-top), 12px) 0 0;
 }
 
 .reveal-stage {
@@ -350,23 +325,33 @@ html, body {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.flip-tap {
-  font-size: 13px;
+.flip-prefix {
+  font-size: 16px;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   opacity: 0.7;
-  margin: 0 0 24px;
+  margin: 0 0 6px;
+  font-weight: 600;
 }
 
 .flip-name {
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 800;
-  margin: 0 0 24px;
+  margin: 0 0 18px;
   word-break: break-word;
   background: linear-gradient(135deg, #ffffff, #ffd6f5);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  line-height: 1.05;
+}
+
+.flip-tap {
+  font-size: 14px;
+  opacity: 0.85;
+  margin: 0 0 22px;
+  line-height: 1.4;
+  max-width: 260px;
 }
 
 .flip-icon {
