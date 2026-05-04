@@ -68,23 +68,21 @@
       </div>
     </section>
 
-    <!-- 3. PANTALLA DE REVELACIÓN (con swipe) -->
+    <!-- 3. PANTALLA DE REVELACIÓN (tarjeta que gira) -->
     <section class="screen" id="screen-reveal">
       <div class="reveal-stage">
-        <!-- Contenido oculto debajo -->
-        <div class="reveal-back" id="reveal-back">
-          <div class="reveal-content" id="reveal-content">
-            <!-- relleno dinámico -->
+        <div class="flip-card" id="flip-card" role="button" tabindex="0" aria-label="Tocar para girar la tarjeta">
+          <div class="flip-inner">
+            <div class="flip-face flip-front">
+              <p class="flip-tap">Toca tu nombre para ver el secreto</p>
+              <h2 class="flip-name" id="flip-name">—</h2>
+              <div class="flip-icon">👆</div>
+            </div>
+            <div class="flip-face flip-back">
+              <div class="reveal-content" id="reveal-content"></div>
+              <p class="flip-back-hint">Toca para ocultar</p>
+            </div>
           </div>
-          <p class="reveal-hint">Desliza la tarjeta hacia abajo para ocultar</p>
-        </div>
-
-        <!-- Tarjeta deslizable -->
-        <div class="reveal-front" id="reveal-front">
-          <div class="reveal-handle"></div>
-          <p class="reveal-front-name" id="reveal-front-name">—</p>
-          <p class="reveal-front-text">Desliza hacia arriba<br>para ver tu secreto</p>
-          <div class="reveal-arrow">⬆️</div>
         </div>
       </div>
 
