@@ -33,22 +33,53 @@
     return a;
   }
 
-  // Devuelve la lista activa de canciones: la guardada por el usuario en
-  // localStorage o, si no hay, las canciones por defecto del juego.
-  function getActiveSongs() {
-    try {
-      const raw = localStorage.getItem('impostor.songs');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (_) { /* ignorar */ }
-    return SONGS;
+  // --- Canciones ---------------------------------------------------------
+  // Las canciones se almacenan como texto plano (una por línea, formato
+  // "Título - Artista"). La fuente puede ser:
+  //   1) localStorage (lista personalizada por el usuario en el editor)
+  //   2) songs.txt en el repositorio (lista por defecto)
+  const SONGS_KEY = 'impostor.songsText';
+  let cachedSongs = [];
+
+  function parseSongs(text) {
+    return String(text || '')
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l && !l.startsWith('#'))
+      .map(line => {
+        const i = line.indexOf(' - ');
+        const title = i >= 0 ? line.slice(0, i).trim() : line;
+        const artist = i >= 0 ? line.slice(i + 3).trim() : '';
+        return { title, artist, emoji: '🎵' };
+      })
+      .filter(s => s.title);
   }
 
+  async function loadSongs() {
+    const stored = localStorage.getItem(SONGS_KEY);
+    if (stored) {
+      const parsed = parseSongs(stored);
+      if (parsed.length > 0) {
+        cachedSongs = parsed;
+        return cachedSongs;
+      }
+    }
+    try {
+      const res = await fetch('songs.txt', { cache: 'no-cache' });
+      const text = await res.text();
+      cachedSongs = parseSongs(text);
+    } catch (_) {
+      cachedSongs = [];
+    }
+    return cachedSongs;
+  }
+
+  // Arrancamos la carga inmediatamente para que esté lista al iniciar partida.
+  loadSongs();
+
   function pickSong() {
-    const list = getActiveSongs();
-    return list[Math.floor(Math.random() * list.length)];
+    if (!cachedSongs || cachedSongs.length === 0) return null;
+    return cachedSongs[Math.floor(Math.random() * cachedSongs.length)];
   }
 
   // Sugerencia de impostores en función del número de jugadores.
@@ -136,7 +167,7 @@
 
   $('#btn-start').addEventListener('click', startGame);
 
-  function startGame() {
+  async function startGame() {
     const numPlayers = parseInt(playersInput.value, 10);
     const numImpostors = parseInt(impostorsInput.value, 10);
     const duration = parseInt(durationInput.value, 10);
@@ -152,6 +183,13 @@
     if (numImpostors >= numPlayers) {
       return setError('Tiene que haber al menos un civil.');
     }
+
+    // Asegurar que la lista de canciones esté disponible
+    if (!cachedSongs || cachedSongs.length === 0) await loadSongs();
+    if (!cachedSongs || cachedSongs.length === 0) {
+      return setError('No se han podido cargar las canciones.');
+    }
+
     setError(null);
 
     // Roles: barajar índices y los primeros N son impostores
