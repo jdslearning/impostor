@@ -33,8 +33,31 @@
     return a;
   }
 
+  // Devuelve la lista activa de canciones: la guardada por el usuario en
+  // localStorage o, si no hay, las canciones por defecto del juego.
+  function getActiveSongs() {
+    try {
+      const raw = localStorage.getItem('impostor.songs');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (_) { /* ignorar */ }
+    return SONGS;
+  }
+
   function pickSong() {
-    return SONGS[Math.floor(Math.random() * SONGS.length)];
+    const list = getActiveSongs();
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  // Sugerencia de impostores en función del número de jugadores.
+  function recommendImpostors(n) {
+    if (n <= 5) return '1';
+    if (n <= 7) return '1-2';
+    if (n <= 9) return '2';
+    if (n <= 11) return '2-3';
+    return '3-4';
   }
 
   function showScreen(id) {
@@ -51,17 +74,22 @@
 
   function getStepBounds(name) {
     if (name === 'players') return { min: 3, max: 20 };
-    if (name === 'impostors') return { min: 1, max: 5 };
+    if (name === 'impostors') return { min: 1, max: 19 };
     if (name === 'duration') return { min: 15, max: 300 };
     return { min: 0, max: 999 };
   }
 
   function syncImpostorMax() {
     const players = parseInt(playersInput.value, 10) || 3;
-    const maxImps = Math.max(1, Math.floor((players - 1) / 2));
+    // Tope técnico: tiene que quedar al menos un civil.
+    const maxImps = Math.max(1, players - 1);
     impostorsInput.max = maxImps;
     if (parseInt(impostorsInput.value, 10) > maxImps) {
       impostorsInput.value = maxImps;
+    }
+    const hint = document.getElementById('impostor-hint');
+    if (hint) {
+      hint.textContent = `(recomendado: ${recommendImpostors(players)})`;
     }
   }
 

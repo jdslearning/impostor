@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Impostor Musical">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2a0a4d"/>
+      <stop offset="55%" stop-color="#4a1a8d"/>
+      <stop offset="100%" stop-color="#ff5cd9"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Fondo con esquinas redondeadas estilo iOS/Android adaptive -->
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#bg)"/>
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#glow)"/>
+
+  <!-- Mujer detective con lupa (emoji renderizado por el sistema) -->
+  <text x="256" y="312"
+        font-size="320"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        font-family="'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji','Twemoji Mozilla',sans-serif">🕵️‍♀️</text>
+</svg>
