@@ -264,7 +264,7 @@ html, body {
   margin: 0 0 32px;
 }
 
-/* ----- Reveal (con tarjeta deslizable) ----------------------------------- */
+/* ----- Reveal (tarjeta que gira) ----------------------------------------- */
 #screen-reveal {
   padding: 0;
 }
@@ -272,14 +272,36 @@ html, body {
 .reveal-stage {
   flex: 1;
   position: relative;
-  overflow: hidden;
   margin: 16px;
-  border-radius: 24px;
-  background: rgba(0, 0, 0, 0.25);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  perspective: 1600px;
+  display: flex;
 }
 
-.reveal-back {
+.flip-card {
+  flex: 1;
+  position: relative;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.flip-card:focus-visible .flip-inner {
+  box-shadow: 0 0 0 3px #7e5cff;
+  border-radius: 24px;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.flip-card.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
   position: absolute;
   inset: 0;
   display: flex;
@@ -287,7 +309,60 @@ html, body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 24px;
+  padding: 28px 24px;
+  border-radius: 24px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.flip-front {
+  background: linear-gradient(160deg, #2a0a4d 0%, #4a1a8d 60%, #ff5cd9 200%);
+}
+
+.flip-back {
+  background: linear-gradient(160deg, #1a0533 0%, #2a0a4d 100%);
+  transform: rotateY(180deg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.flip-tap {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  margin: 0 0 24px;
+}
+
+.flip-name {
+  font-size: 36px;
+  font-weight: 800;
+  margin: 0 0 24px;
+  word-break: break-word;
+  background: linear-gradient(135deg, #ffffff, #ffd6f5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.flip-icon {
+  font-size: 44px;
+  animation: tap-pulse 1.6s ease infinite;
+}
+
+@keyframes tap-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+.flip-back-hint {
+  position: absolute;
+  bottom: 18px;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.45;
+  margin: 0;
 }
 
 .reveal-content {
@@ -345,68 +420,6 @@ html, body {
   line-height: 1.5;
   opacity: 0.85;
   margin: 0 0 12px;
-}
-
-.reveal-hint {
-  position: absolute;
-  bottom: 18px;
-  left: 0; right: 0;
-  text-align: center;
-  font-size: 12px;
-  opacity: 0.45;
-  margin: 0;
-}
-
-.reveal-front {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  background: linear-gradient(160deg, #2a0a4d 0%, #4a1a8d 60%, #ff5cd9 200%);
-  border-radius: 24px;
-  padding: 24px;
-  cursor: grab;
-  touch-action: none;
-  will-change: transform;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
-}
-.reveal-front.dragging { transition: none; cursor: grabbing; }
-.reveal-front.revealed { transform: translateY(-100%); }
-
-.reveal-handle {
-  width: 60px;
-  height: 5px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.4);
-  margin-bottom: 36px;
-}
-
-.reveal-front-name {
-  font-size: 28px;
-  font-weight: 800;
-  margin: 0 0 12px;
-  word-break: break-word;
-}
-
-.reveal-front-text {
-  font-size: 18px;
-  margin: 0 0 24px;
-  line-height: 1.5;
-  opacity: 0.92;
-}
-
-.reveal-arrow {
-  font-size: 36px;
-  animation: bounce 1.4s ease infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.5; }
-  50% { transform: translateY(-12px); opacity: 1; }
 }
 
 /* ----- Pantalla "listos para bailar" ------------------------------------ */

@@ -178,22 +178,21 @@
     showScreen('screen-reveal');
   });
 
-  // --- Reveal con tarjeta deslizable -------------------------------------
-  const revealFront = $('#reveal-front');
-  const revealBack = $('#reveal-back');
+  // --- Reveal con tarjeta que gira ---------------------------------------
+  const flipCard = $('#flip-card');
+  const flipName = $('#flip-name');
   const revealContent = $('#reveal-content');
-  const revealFrontName = $('#reveal-front-name');
   const btnNext = $('#btn-next-player');
 
-  let drag = null; // estado de gesture
+  let hasSeen = false;
 
   function renderReveal() {
     const player = currentPlayer();
-    revealFrontName.textContent = player.name;
+    flipName.textContent = player.name;
 
-    // Reseteamos la tarjeta
-    revealFront.classList.remove('revealed');
-    revealFront.style.transform = '';
+    // Reset estado
+    flipCard.classList.remove('flipped');
+    hasSeen = false;
     btnNext.disabled = true;
     btnNext.textContent =
       state.revealIndex === state.players.length - 1
@@ -233,87 +232,23 @@
     }[c]));
   }
 
-  function onDragStart(e) {
-    const point = getPoint(e);
-    if (!point) return;
-    drag = {
-      startY: point.y,
-      currentY: point.y,
-      revealedAtStart: revealFront.classList.contains('revealed'),
-    };
-    revealFront.classList.add('dragging');
-  }
-
-  function onDragMove(e) {
-    if (!drag) return;
-    const point = getPoint(e);
-    if (!point) return;
-    drag.currentY = point.y;
-    const delta = drag.currentY - drag.startY;
-    const height = revealFront.offsetHeight;
-
-    let translate;
-    if (drag.revealedAtStart) {
-      // Si estaba abierta, sólo permitimos mover hacia abajo (volver a tapar)
-      translate = -height + Math.max(0, delta);
-      translate = Math.min(0, translate);
-    } else {
-      // Si estaba cerrada, sólo hacia arriba (revelar)
-      translate = Math.min(0, delta);
-      translate = Math.max(-height, translate);
-    }
-    revealFront.style.transform = `translateY(${translate}px)`;
-    if (e.cancelable) e.preventDefault();
-  }
-
-  function onDragEnd() {
-    if (!drag) return;
-    revealFront.classList.remove('dragging');
-    const delta = drag.currentY - drag.startY;
-    const height = revealFront.offsetHeight;
-    const threshold = height * 0.25;
-
-    let revealed;
-    if (drag.revealedAtStart) {
-      // Volver a cerrar si arrastró suficientemente hacia abajo
-      revealed = !(delta > threshold);
-    } else {
-      revealed = (-delta) > threshold;
-    }
-
-    revealFront.style.transform = '';
-    revealFront.classList.toggle('revealed', revealed);
-
-    // El "siguiente" se habilita una vez vista la canción y vuelta a tapar
-    if (drag.revealedAtStart && !revealed) {
+  function toggleFlip() {
+    const willBeFlipped = !flipCard.classList.contains('flipped');
+    flipCard.classList.toggle('flipped', willBeFlipped);
+    if (willBeFlipped) {
+      hasSeen = true;
+    } else if (hasSeen) {
+      // Vio el secreto y volvió a esconderlo: desbloquea "Siguiente"
       btnNext.disabled = false;
     }
-
-    drag = null;
   }
 
-  function getPoint(e) {
-    if (e.touches && e.touches[0]) return { y: e.touches[0].clientY };
-    if (e.changedTouches && e.changedTouches[0]) return { y: e.changedTouches[0].clientY };
-    if (typeof e.clientY === 'number') return { y: e.clientY };
-    return null;
-  }
-
-  revealFront.addEventListener('touchstart', onDragStart, { passive: true });
-  revealFront.addEventListener('touchmove', onDragMove, { passive: false });
-  revealFront.addEventListener('touchend', onDragEnd);
-  revealFront.addEventListener('touchcancel', onDragEnd);
-
-  revealFront.addEventListener('mousedown', e => {
-    onDragStart(e);
-    const move = ev => onDragMove(ev);
-    const up = ev => {
-      onDragEnd(ev);
-      window.removeEventListener('mousemove', move);
-      window.removeEventListener('mouseup', up);
-    };
-    window.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', up);
+  flipCard.addEventListener('click', toggleFlip);
+  flipCard.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleFlip();
+    }
   });
 
   btnNext.addEventListener('click', () => {
