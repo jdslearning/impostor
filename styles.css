@@ -234,10 +234,24 @@ html, body {
 }
 
 .error {
-  color: #ff7a8a;
-  font-size: 13px;
-  margin: 12px 0 0;
+  color: #ffd0db;
+  background: rgba(255, 92, 138, 0.18);
+  border: 1px solid rgba(255, 92, 138, 0.45);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 14px;
+  padding: 12px 14px;
   text-align: center;
+}
+.error.shake {
+  animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-6px); }
+  40%, 60% { transform: translateX(6px); }
 }
 
 /* ----- Pase de móvil ------------------------------------------------------ */
@@ -641,26 +655,31 @@ html, body {
 
 /* ----- Editor de canciones ----------------------------------------------- */
 body.editor-page {
-  overflow: auto;
+  overflow: hidden;
 }
 body.editor-page #app {
-  height: auto;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100%;
+  height: 100dvh;
+}
+body.editor-page #app {
+  position: relative;
 }
 body.editor-page .screen {
   position: relative;
   inset: auto;
-  min-height: 100vh;
-  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 .editor-header {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 8px 4px 12px;
+  padding: 4px 0 12px;
 }
 .editor-header h1 {
   font-size: 22px;
@@ -671,25 +690,34 @@ body.editor-page .screen {
   color: transparent;
 }
 .editor-header .back-link {
-  color: #ddd;
+  color: #fff;
   text-decoration: none;
   font-size: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  padding: 8px 12px;
+  font-weight: 600;
+  background: rgba(126, 92, 255, 0.25);
+  border: 1px solid rgba(126, 92, 255, 0.6);
+  padding: 8px 14px;
   border-radius: 10px;
+  transition: background 0.15s, transform 0.1s;
+}
+.editor-header .back-link:active {
+  background: rgba(126, 92, 255, 0.45);
+  transform: scale(0.97);
 }
 
 .editor-help {
+  flex: 0 0 auto;
   font-size: 14px;
-  opacity: 0.8;
-  margin: 0 0 12px;
+  opacity: 0.85;
+  margin: 0 0 8px;
   line-height: 1.45;
 }
 
 .editor-status {
+  flex: 0 0 auto;
   font-size: 13px;
   opacity: 0.7;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
 .editor-status.dirty {
   color: #ffba5c;
@@ -701,32 +729,35 @@ body.editor-page .screen {
 }
 
 .songs-text {
+  flex: 1 1 auto;
   width: 100%;
-  min-height: 50vh;
-  resize: vertical;
+  min-height: 200px;
+  resize: none;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
   padding: 14px 16px;
   color: #fff;
-  font-size: 15px;
-  line-height: 1.5;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 16px;
+  line-height: 1.55;
+  font-family: inherit;
   outline: none;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .songs-text:focus {
   border-color: #7e5cff;
 }
 
 .editor-toolbar {
+  flex: 0 0 auto;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 10px;
+  margin-top: 4px;
+  padding-bottom: 4px;
 }
 .editor-toolbar .btn {
-  flex: 1 1 auto;
-  font-size: 14px;
-  padding: 12px 14px;
+  flex: 1 1 140px;
+  font-size: 15px;
+  padding: 14px 16px;
 }

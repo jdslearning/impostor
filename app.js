@@ -151,18 +151,29 @@
         const cur = parseInt(input.value, 10) || min;
         const dynMax = parseInt(input.max, 10) || max;
         input.value = clamp(cur + delta, min, dynMax);
-        input.dispatchEvent(new Event('change'));
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
       });
     });
 
-    input.addEventListener('change', () => {
+    // Actualización en vivo (cada pulsación / cambio del valor)
+    const onInput = () => {
+      if (name === 'players') {
+        // Sólo recalculamos hint/max — no recreamos los nombres en cada pulsación
+        // para no perder el foco mientras el usuario escribe.
+        syncImpostorMax();
+      }
+    };
+    const onChange = () => {
       const dynMax = parseInt(input.max, 10) || max;
       input.value = clamp(parseInt(input.value, 10) || min, min, dynMax);
       if (name === 'players') {
         renderNameInputs();
         syncImpostorMax();
       }
-    });
+    };
+    input.addEventListener('input', onInput);
+    input.addEventListener('change', onChange);
   });
 
   $('#btn-start').addEventListener('click', startGame);
@@ -172,9 +183,12 @@
     const numImpostors = parseInt(impostorsInput.value, 10);
     const duration = parseInt(durationInput.value, 10);
 
-    const names = $$('input', namesList).map(i => i.value.trim());
-    if (names.some(n => !n)) {
-      return setError('Cada jugador necesita un nombre.');
+    const nameInputs = $$('input', namesList);
+    const names = nameInputs.map(i => i.value.trim());
+    const firstEmpty = names.findIndex(n => !n);
+    if (firstEmpty >= 0) {
+      nameInputs[firstEmpty].focus();
+      return setError('Falta el nombre del jugador ' + (firstEmpty + 1) + '.');
     }
     const lower = names.map(n => n.toLowerCase());
     if (new Set(lower).size !== lower.length) {
@@ -219,9 +233,16 @@
     if (!msg) {
       setupError.hidden = true;
       setupError.textContent = '';
+      setupError.classList.remove('shake');
     } else {
       setupError.hidden = false;
       setupError.textContent = msg;
+      setupError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Reanima la sacudida cada vez que cambia el mensaje
+      setupError.classList.remove('shake');
+      // Forzar reflow para reiniciar la animación
+      void setupError.offsetWidth;
+      setupError.classList.add('shake');
     }
   }
 
