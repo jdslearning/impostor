@@ -7,8 +7,9 @@
 
   // --- Estado global ------------------------------------------------------
   const state = {
+    mode: 'musical',      // musical | classic
     players: [],          // [{ id, name, role, alive }]
-    song: null,           // canción de los civiles
+    secretItem: null,     // canción/palabra de los civiles
     revealIndex: 0,       // índice del jugador en la fase de reparto
     duration: 60,         // segundos por ronda
     timeLeft: 60,
@@ -16,6 +17,8 @@
     timerPaused: false,
     accusedId: null,
     rounds: 0,
+    classicHintsEnabled: true,
+    conversationStarter: null,
   };
 
   // --- Utilidades ---------------------------------------------------------
@@ -33,13 +36,66 @@
     return a;
   }
 
-  // --- Canciones ---------------------------------------------------------
-  // Las canciones se almacenan como texto plano (una por línea, formato
-  // "Título - Artista"). La fuente puede ser:
-  //   1) localStorage (lista personalizada por el usuario en el editor)
-  //   2) songs.txt en el repositorio (lista por defecto)
+  // --- Modos y catálogos -------------------------------------------------
+  // Las canciones usan "Título - Artista"; las palabras usan "Palabra | pista".
+  // La fuente puede ser localStorage o los archivos por defecto del repositorio.
+  const MODE_KEY = 'impostor.gameMode';
+  const CLASSIC_HINTS_KEY = 'impostor.classicHintsEnabled';
   const SONGS_KEY = 'impostor.songsText';
-  let cachedSongs = [];
+  const WORDS_KEY = 'impostor.wordsText';
+  const catalogs = {
+    musical: [],
+    classic: [],
+  };
+
+  const MODES = {
+    musical: {
+      icon: '🎵',
+      title: 'Impostor Musical',
+      subtitle: 'Encuentra al impostor en la pista de baile',
+      editLabel: '✏️ Editar canciones',
+      editHref: 'editor.html?type=songs',
+      storageKey: SONGS_KEY,
+      defaultFile: 'songs.txt',
+      emptyError: 'No se han podido cargar las canciones.',
+      readyTitle: '¡Todos listos!',
+      readyIntro: 'Buscad la canción en vuestro móvil, poneos los auriculares y… 💃🕺',
+      readyRules: [
+        '🎧 Civiles: bailad <strong>vuestra canción secreta</strong>.',
+        '🤫 Impostores: poned cualquier canción y disimulad.',
+        '👀 Observad a los demás. ¿Quién baila raro?',
+      ],
+      startLabel: 'Empezar a bailar',
+      timerLabel: '¡A bailar!',
+      secretSummary: '🎵 Canción secreta',
+      footnote: 'Pasa el móvil de jugador en jugador. Cada uno girará la tarjeta para descubrir su canción secreta.',
+    },
+    classic: {
+      icon: '🧩',
+      title: 'Impostor Clásico',
+      subtitle: 'Descubre quién habla sin conocer la palabra',
+      editLabel: '✏️ Editar palabras',
+      editHref: 'editor.html?type=words',
+      storageKey: WORDS_KEY,
+      defaultFile: 'words.txt',
+      emptyError: 'No se han podido cargar las palabras.',
+      readyTitle: '¡Palabra repartida!',
+      readyIntro: 'Por turnos, dad pistas sin decir la palabra exacta.',
+      readyRules: [
+        '💬 Civiles: dad pistas sutiles sobre <strong>la palabra secreta</strong>.',
+        '🤫 Impostores: usad vuestra pista y fingid que sabéis la palabra.',
+        '👀 Observad dudas, pistas demasiado vagas o conexiones raras.',
+      ],
+      startLabel: 'Empezar ronda',
+      timerLabel: '¡A hablar!',
+      secretSummary: '🧩 Palabra secreta',
+      footnote: 'Pasa el móvil de jugador en jugador. Cada uno girará la tarjeta para descubrir su palabra o pista.',
+    },
+  };
+
+  const savedMode = localStorage.getItem(MODE_KEY);
+  if (MODES[savedMode]) state.mode = savedMode;
+  state.classicHintsEnabled = localStorage.getItem(CLASSIC_HINTS_KEY) !== 'false';
 
   function parseSongs(text) {
     return String(text || '')
@@ -50,36 +106,56 @@
         const i = line.indexOf(' - ');
         const title = i >= 0 ? line.slice(0, i).trim() : line;
         const artist = i >= 0 ? line.slice(i + 3).trim() : '';
-        return { title, artist, emoji: '🎵' };
+        return { title, detail: artist, hint: '', emoji: '🎵' };
       })
       .filter(s => s.title);
   }
 
-  async function loadSongs() {
-    const stored = localStorage.getItem(SONGS_KEY);
+  function parseWords(text) {
+    return String(text || '')
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l && !l.startsWith('#'))
+      .map(line => {
+        const i = line.indexOf('|');
+        const title = i >= 0 ? line.slice(0, i).trim() : line;
+        const hint = i >= 0 ? line.slice(i + 1).trim() : '';
+        return { title, detail: '', hint, emoji: '🧩' };
+      })
+      .filter(s => s.title);
+  }
+
+  function parseCatalog(mode, text) {
+    return mode === 'classic' ? parseWords(text) : parseSongs(text);
+  }
+
+  async function loadCatalog(mode = state.mode) {
+    const config = MODES[mode];
+    const stored = localStorage.getItem(config.storageKey);
     if (stored) {
-      const parsed = parseSongs(stored);
+      const parsed = parseCatalog(mode, stored);
       if (parsed.length > 0) {
-        cachedSongs = parsed;
-        return cachedSongs;
+        catalogs[mode] = parsed;
+        return catalogs[mode];
       }
     }
     try {
-      const res = await fetch('songs.txt', { cache: 'no-cache' });
+      const res = await fetch(config.defaultFile, { cache: 'no-cache' });
       const text = await res.text();
-      cachedSongs = parseSongs(text);
+      catalogs[mode] = parseCatalog(mode, text);
     } catch (_) {
-      cachedSongs = [];
+      catalogs[mode] = [];
     }
-    return cachedSongs;
+    return catalogs[mode];
   }
 
   // Arrancamos la carga inmediatamente para que esté lista al iniciar partida.
-  loadSongs();
+  loadCatalog(state.mode);
 
-  function pickSong() {
-    if (!cachedSongs || cachedSongs.length === 0) return null;
-    return cachedSongs[Math.floor(Math.random() * cachedSongs.length)];
+  function pickSecretItem() {
+    const items = catalogs[state.mode];
+    if (!items || items.length === 0) return null;
+    return items[Math.floor(Math.random() * items.length)];
   }
 
   // Sugerencia de impostores en función del número de jugadores.
@@ -96,17 +172,85 @@
     window.scrollTo(0, 0);
   }
 
+  function currentMode() {
+    return MODES[state.mode];
+  }
+
+  function classicSetupDuration() {
+    const players = clamp(parseInt(playersInput.value, 10) || 3, 3, 20);
+    return players * 30;
+  }
+
+  function syncClassicDuration() {
+    if (state.mode !== 'classic') return;
+    durationInput.value = classicSetupDuration();
+  }
+
+  function updateClassicRules() {
+    if (state.mode !== 'classic') return;
+    const impostorRule = state.classicHintsEnabled
+      ? '🤫 Impostores: usad vuestra pista y fingid que sabéis la palabra.'
+      : '🤫 Impostores: no recibís pista. Escuchad bien y fingid que sabéis la palabra.';
+    $('#ready-rules').innerHTML = [
+      '💬 Civiles: dad pistas sutiles sobre <strong>la palabra secreta</strong>.',
+      impostorRule,
+      '👀 Observad dudas, pistas demasiado vagas o conexiones raras.',
+    ].map(rule => `<li>${rule}</li>`).join('');
+    $('#setup-footnote').textContent = state.classicHintsEnabled
+      ? 'Pasa el móvil de jugador en jugador. Cada uno girará la tarjeta para descubrir su palabra o pista.'
+      : 'Pasa el móvil de jugador en jugador. Los civiles verán la palabra y los impostores solo su rol.';
+  }
+
+  function updateModeUi() {
+    const mode = currentMode();
+    $('#mode-icon').textContent = mode.icon;
+    $('#mode-title').textContent = mode.title;
+    $('#mode-subtitle').textContent = mode.subtitle;
+    $('#edit-catalog-link').textContent = mode.editLabel;
+    $('#edit-catalog-link').href = mode.editHref;
+    $('#ready-title').textContent = mode.readyTitle;
+    $('#ready-intro').textContent = mode.readyIntro;
+    $('#ready-rules').innerHTML = mode.readyRules.map(rule => `<li>${rule}</li>`).join('');
+    $('#btn-start-timer').textContent = mode.startLabel;
+    $('#timer-label').textContent = mode.timerLabel;
+    $('#setup-footnote').textContent = mode.footnote;
+    $('#classic-hint-field').hidden = state.mode !== 'classic';
+    $('#duration-label').innerHTML = state.mode === 'classic'
+      ? 'Duración de la ronda <em class="hint">(30 s por jugador)</em>'
+      : 'Duración de la ronda (segundos)';
+    syncClassicDuration();
+    updateClassicRules();
+    document.title = mode.title;
+  }
+
+  async function toggleMode() {
+    state.mode = state.mode === 'musical' ? 'classic' : 'musical';
+    localStorage.setItem(MODE_KEY, state.mode);
+    updateModeUi();
+    await loadCatalog(state.mode);
+  }
+
   // --- Configuración ------------------------------------------------------
   const playersInput = $('#input-players');
   const impostorsInput = $('#input-impostors');
   const durationInput = $('#input-duration');
+  const classicHintsInput = $('#input-classic-hints');
   const namesList = $('#names-list');
   const setupError = $('#setup-error');
+  const modeToggle = $('#btn-mode-toggle');
+
+  modeToggle.addEventListener('click', toggleMode);
+  classicHintsInput.checked = state.classicHintsEnabled;
+  classicHintsInput.addEventListener('change', () => {
+    state.classicHintsEnabled = classicHintsInput.checked;
+    localStorage.setItem(CLASSIC_HINTS_KEY, String(state.classicHintsEnabled));
+    updateClassicRules();
+  });
 
   function getStepBounds(name) {
     if (name === 'players') return { min: 3, max: 20 };
     if (name === 'impostors') return { min: 1, max: 19 };
-    if (name === 'duration') return { min: 15, max: 300 };
+    if (name === 'duration') return { min: 15, max: 900 };
     return { min: 0, max: 999 };
   }
 
@@ -170,6 +314,7 @@
       if (name === 'players') {
         renderNameInputs();
         syncImpostorMax();
+        syncClassicDuration();
       }
     };
     input.addEventListener('input', onInput);
@@ -198,10 +343,10 @@
       return setError('Tiene que haber al menos un civil.');
     }
 
-    // Asegurar que la lista de canciones esté disponible
-    if (!cachedSongs || cachedSongs.length === 0) await loadSongs();
-    if (!cachedSongs || cachedSongs.length === 0) {
-      return setError('No se han podido cargar las canciones.');
+    // Asegurar que el catálogo del modo esté disponible.
+    if (!catalogs[state.mode] || catalogs[state.mode].length === 0) await loadCatalog(state.mode);
+    if (!catalogs[state.mode] || catalogs[state.mode].length === 0) {
+      return setError(currentMode().emptyError);
     }
 
     setError(null);
@@ -216,11 +361,12 @@
       role: impostorIdx.has(i) ? 'impostor' : 'civil',
       alive: true,
     }));
-    state.song = pickSong();
+    state.secretItem = pickSecretItem();
     state.duration = duration;
     state.timeLeft = duration;
     state.revealIndex = 0;
     state.rounds = 0;
+    state.conversationStarter = null;
 
     // Barajamos el orden de reparto para que no coincida con el orden de la lista
     state.revealOrder = shuffle(state.players.map(p => p.id));
@@ -290,26 +436,57 @@
     revealContent.classList.remove('civil', 'impostor');
     if (player.role === 'impostor') {
       revealContent.classList.add('impostor');
-      revealContent.innerHTML = `
-        <div class="role-label">Tu rol</div>
-        <div class="role-title">🤫 Eres el impostor</div>
-        <p class="impostor-msg">
-          No conoces la canción. Pon lo que quieras y trata de imitar
-          a los demás bailarines.
-        </p>
-        <p class="impostor-msg">
-          ¡Que no te pillen!
-        </p>
-      `;
+      if (state.mode === 'classic') {
+        if (state.classicHintsEnabled) {
+          revealContent.innerHTML = `
+            <div class="role-label">Tu pista</div>
+            <div class="role-title">🤫 Eres el impostor</div>
+            <h3 class="song-title">${escapeHtml(state.secretItem.hint || 'Pista ambigua')}</h3>
+            <p class="impostor-msg">
+              No conoces la palabra exacta. Usa esta pista para disimular.
+            </p>
+          `;
+        } else {
+          revealContent.innerHTML = `
+            <div class="role-label">Tu rol</div>
+            <div class="role-title">🤫 Eres el impostor</div>
+            <p class="impostor-msg">
+              No conoces la palabra exacta y no tienes pista. Escucha a los demás
+              y trata de encajar.
+            </p>
+          `;
+        }
+      } else {
+        revealContent.innerHTML = `
+          <div class="role-label">Tu rol</div>
+          <div class="role-title">🤫 Eres el impostor</div>
+          <p class="impostor-msg">
+            No conoces la canción. Pon lo que quieras y trata de imitar
+            a los demás bailarines.
+          </p>
+          <p class="impostor-msg">
+            ¡Que no te pillen!
+          </p>
+        `;
+      }
     } else {
       revealContent.classList.add('civil');
-      revealContent.innerHTML = `
-        <div class="role-label">Tu canción secreta</div>
-        <div class="song-emoji">${state.song.emoji}</div>
-        <h3 class="song-title">${escapeHtml(state.song.title)}</h3>
-        <p class="song-artist">${escapeHtml(state.song.artist)}</p>
-        <p class="impostor-msg">Búscala en tu móvil y baila como nadie.</p>
-      `;
+      if (state.mode === 'classic') {
+        revealContent.innerHTML = `
+          <div class="role-label">Tu palabra secreta</div>
+          <div class="song-emoji">${state.secretItem.emoji}</div>
+          <h3 class="song-title">${escapeHtml(state.secretItem.title)}</h3>
+          <p class="impostor-msg">Da pistas sutiles. Si eres demasiado obvio, ayudas al impostor.</p>
+        `;
+      } else {
+        revealContent.innerHTML = `
+          <div class="role-label">Tu canción secreta</div>
+          <div class="song-emoji">${state.secretItem.emoji}</div>
+          <h3 class="song-title">${escapeHtml(state.secretItem.title)}</h3>
+          <p class="song-artist">${escapeHtml(state.secretItem.detail)}</p>
+          <p class="impostor-msg">Búscala en tu móvil y baila como nadie.</p>
+        `;
+      }
     }
   }
 
@@ -349,6 +526,10 @@
 
   // --- Pantalla "listos" --------------------------------------------------
   $('#btn-start-timer').addEventListener('click', () => {
+    if (state.mode === 'classic') {
+      state.duration = aliveCount() * 30;
+      state.conversationStarter = pickConversationStarter();
+    }
     state.timeLeft = state.duration;
     startTimer();
     showScreen('screen-timer');
@@ -372,10 +553,27 @@
     timerDisplay.classList.toggle('warning', state.timeLeft <= 10);
   }
 
+  function pickConversationStarter() {
+    const alive = state.players.filter(p => p.alive);
+    if (!alive.length) return null;
+    return alive[Math.floor(Math.random() * alive.length)].name;
+  }
+
+  function updateTimerLabel() {
+    if (state.mode === 'classic') {
+      $('#timer-label').textContent = state.conversationStarter
+        ? `Empieza hablando: ${state.conversationStarter}`
+        : 'Empieza la conversación';
+    } else {
+      $('#timer-label').textContent = currentMode().timerLabel;
+    }
+  }
+
   function startTimer() {
     clearInterval(state.timerHandle);
     state.timerPaused = false;
     btnTimerToggle.textContent = 'Pausar';
+    updateTimerLabel();
     renderTimer();
     state.timerHandle = setInterval(() => {
       if (state.timerPaused) return;
@@ -492,7 +690,7 @@
     const winner = checkWinCondition();
     if (winner) return endGame(winner);
 
-    // Volver a bailar otra ronda
+    // Volver a la siguiente ronda
     state.timeLeft = state.duration;
     showScreen('screen-ready');
   });
@@ -526,8 +724,8 @@
     const songRow = document.createElement('div');
     songRow.className = 'summary-row';
     songRow.innerHTML = `
-      <span>🎵 Canción secreta</span>
-      <strong>${escapeHtml(state.song.title)}</strong>
+      <span>${currentMode().secretSummary}</span>
+      <strong>${escapeHtml(state.secretItem.title)}</strong>
     `;
     summary.appendChild(songRow);
 
@@ -560,10 +758,11 @@
       role: impostorIdx.has(i) ? 'impostor' : 'civil',
       alive: true,
     }));
-    state.song = pickSong();
+    state.secretItem = pickSecretItem();
     state.timeLeft = state.duration;
     state.revealIndex = 0;
     state.rounds = 0;
+    state.conversationStarter = null;
     state.revealOrder = shuffle(state.players.map(p => p.id));
 
     renderPass();
@@ -574,6 +773,7 @@
   });
 
   // --- Init ---------------------------------------------------------------
+  updateModeUi();
   renderNameInputs();
   syncImpostorMax();
 

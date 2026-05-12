@@ -57,14 +57,37 @@ html, body {
 }
 .hero-small { margin: 8px 0 16px; }
 
-.hero h1 {
+.hero h1,
+.mode-title {
   font-size: 28px;
   margin: 0 0 8px;
   background: linear-gradient(90deg, #ff5cd9, #7e5cff, #5ce1ff);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  letter-spacing: -0.5px;
+  letter-spacing: 0;
+}
+
+.mode-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.15s ease;
+}
+.mode-title:active {
+  transform: scale(0.97);
+}
+.mode-title:focus-visible {
+  outline: 3px solid rgba(92, 225, 255, 0.7);
+  outline-offset: 6px;
+  border-radius: 10px;
 }
 
 .hero h2 {
@@ -183,6 +206,59 @@ html, body {
   border-color: #7e5cff;
 }
 .names-list input::placeholder { opacity: 0.4; }
+
+.switch-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.switch-field[hidden] {
+  display: none;
+}
+.switch-field > span:first-child {
+  margin: 0;
+}
+.switch-field input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.switch-control {
+  position: relative;
+  flex: 0 0 auto;
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  transition: background 0.18s ease;
+}
+.switch-control::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.18s ease;
+}
+.switch-field input:checked + .switch-control {
+  background: linear-gradient(135deg, #ff5cd9, #7e5cff);
+}
+.switch-field input:checked + .switch-control::after {
+  transform: translateX(22px);
+}
+.switch-field:has(input:focus-visible) {
+  outline: 3px solid rgba(92, 225, 255, 0.55);
+  outline-offset: 3px;
+}
 
 /* ----- Botones ------------------------------------------------------------ */
 .btn {
@@ -653,7 +729,7 @@ html, body {
 .badge.alive { background: rgba(255, 255, 255, 0.1); color: #fff; }
 .badge.eliminated { background: rgba(0, 0, 0, 0.3); color: #999; text-decoration: line-through; }
 
-/* ----- Editor de canciones ----------------------------------------------- */
+/* ----- Editor de catálogos ----------------------------------------------- */
 body.editor-page {
   overflow: hidden;
 }
@@ -728,6 +804,7 @@ body.editor-page .screen {
   opacity: 1;
 }
 
+.catalog-text,
 .songs-text {
   flex: 1 1 auto;
   width: 100%;
@@ -744,6 +821,7 @@ body.editor-page .screen {
   outline: none;
   margin-bottom: 14px;
 }
+.catalog-text:focus,
 .songs-text:focus {
   border-color: #7e5cff;
 }

@@ -14,15 +14,21 @@
   <meta name="apple-mobile-web-app-title" content="Impostor" />
   <meta name="mobile-web-app-capable" content="yes" />
 
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body>
   <main id="app">
     <!-- 1. PANTALLA DE CONFIGURACIÓN -->
     <section class="screen active" id="screen-setup">
       <header class="hero">
-        <h1>🎵 Impostor Musical 🕵️</h1>
-        <p class="subtitle">Encuentra al impostor en la pista de baile</p>
+        <h1>
+          <button id="btn-mode-toggle" class="mode-title" type="button" aria-label="Cambiar modo de juego">
+            <span id="mode-icon">🎵</span>
+            <span id="mode-title">Impostor Musical</span>
+            <span>🕵️</span>
+          </button>
+        </h1>
+        <p class="subtitle" id="mode-subtitle">Encuentra al impostor en la pista de baile</p>
       </header>
 
       <div class="card">
@@ -44,11 +50,17 @@
           </div>
         </label>
 
+        <label class="field switch-field" id="classic-hint-field" hidden>
+          <span>Dar pista al impostor</span>
+          <input id="input-classic-hints" type="checkbox" checked />
+          <span class="switch-control" aria-hidden="true"></span>
+        </label>
+
         <label class="field">
-          <span>Duración de la ronda (segundos)</span>
+          <span id="duration-label">Duración de la ronda (segundos)</span>
           <div class="stepper" data-stepper="duration">
             <button type="button" class="step-btn" data-step="-15">−</button>
-            <input id="input-duration" type="number" min="15" max="300" step="15" value="60" inputmode="numeric" />
+            <input id="input-duration" type="number" min="15" max="900" step="15" value="60" inputmode="numeric" />
             <button type="button" class="step-btn" data-step="15">+</button>
           </div>
         </label>
@@ -60,10 +72,10 @@
 
         <p id="setup-error" class="error" hidden></p>
         <button id="btn-start" class="btn btn-primary btn-block">Empezar partida</button>
-        <a href="editor.html" class="btn btn-ghost btn-block">✏️ Editar canciones</a>
+        <a id="edit-catalog-link" href="editor.html?type=songs" class="btn btn-ghost btn-block">✏️ Editar canciones</a>
       </div>
 
-      <footer class="footnote">
+      <footer class="footnote" id="setup-footnote">
         Pasa el móvil de jugador en jugador. Cada uno girará la tarjeta para descubrir su canción secreta.
       </footer>
     </section>
@@ -102,9 +114,9 @@
     <!-- 4. PANTALLA DE INICIO DE BAILE -->
     <section class="screen" id="screen-ready">
       <div class="ready-card">
-        <h2>¡Todos listos!</h2>
-        <p>Buscad la canción en vuestro móvil, poneos los auriculares y… 💃🕺</p>
-        <ul class="rules">
+        <h2 id="ready-title">¡Todos listos!</h2>
+        <p id="ready-intro">Buscad la canción en vuestro móvil, poneos los auriculares y… 💃🕺</p>
+        <ul class="rules" id="ready-rules">
           <li>🎧 Civiles: bailad <strong>vuestra canción secreta</strong>.</li>
           <li>🤫 Impostores: poned cualquier canción y disimulad.</li>
           <li>👀 Observad a los demás. ¿Quién baila raro?</li>
@@ -116,7 +128,7 @@
     <!-- 5. PANTALLA DE TEMPORIZADOR -->
     <section class="screen" id="screen-timer">
       <div class="timer-stage">
-        <p class="timer-label">¡A bailar!</p>
+        <p class="timer-label" id="timer-label">¡A bailar!</p>
         <div id="timer-display" class="timer-display">01:00</div>
         <div class="timer-progress">
           <div id="timer-bar" class="timer-bar"></div>
@@ -160,6 +172,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>

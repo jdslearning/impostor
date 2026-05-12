@@ -4,23 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#2a0a4d" />
-  <title>Editor de canciones · Impostor Musical</title>
+  <title>Editor · Impostor</title>
 
   <link rel="icon" type="image/png" href="icon-1024.png" />
   <link rel="apple-touch-icon" href="icon-1024.png" />
   <link rel="manifest" href="manifest.webmanifest" />
 
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body class="editor-page">
   <main id="app">
     <section class="screen active" id="screen-editor">
       <header class="editor-header">
-        <h1>🎵 Canciones</h1>
+        <h1 id="editor-title">🎵 Canciones</h1>
         <a href="index.html" class="back-link">← Volver</a>
       </header>
 
-      <p class="editor-help">
+      <p id="editor-help" class="editor-help">
         Una canción por línea, con el formato <strong>Título - Artista</strong>.
         Edita libremente y pulsa Guardar.
       </p>
@@ -28,8 +28,8 @@
       <p id="editor-status" class="editor-status">—</p>
 
       <textarea
-        id="songs-text"
-        class="songs-text"
+        id="catalog-text"
+        class="catalog-text"
         spellcheck="false"
         autocomplete="off"
         autocapitalize="off"
@@ -43,6 +43,6 @@
     </section>
   </main>
 
-  <script src="editor.js?v=4"></script>
+  <script src="editor.js?v=5"></script>
 </body>
 </html>
