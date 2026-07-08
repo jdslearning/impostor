@@ -368,8 +368,9 @@
     state.rounds = 0;
     state.conversationStarter = null;
 
-    // Barajamos el orden de reparto para que no coincida con el orden de la lista
-    state.revealOrder = shuffle(state.players.map(p => p.id));
+    // El orden de reparto sigue el mismo orden en que se introdujeron los nombres
+    // (normalmente el orden en que están sentados los jugadores en la mesa).
+    state.revealOrder = state.players.map(p => p.id);
 
     showScreen('screen-pass');
     renderPass();
@@ -763,7 +764,8 @@
     state.revealIndex = 0;
     state.rounds = 0;
     state.conversationStarter = null;
-    state.revealOrder = shuffle(state.players.map(p => p.id));
+    // Mismo orden de reparto que la lista de jugadores (orden de la mesa).
+    state.revealOrder = state.players.map(p => p.id);
 
     renderPass();
   });
