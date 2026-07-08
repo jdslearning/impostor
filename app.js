@@ -203,9 +203,11 @@
 
   function updateModeUi() {
     const mode = currentMode();
+    const otherMode = MODES[state.mode === 'musical' ? 'classic' : 'musical'];
     $('#mode-icon').textContent = mode.icon;
     $('#mode-title').textContent = mode.title;
     $('#mode-subtitle').textContent = mode.subtitle;
+    $('#btn-mode-switch-link').textContent = `Cambiar a modo ${otherMode.title.replace('Impostor ', '')} ${otherMode.icon}`;
     $('#edit-catalog-link').textContent = mode.editLabel;
     $('#edit-catalog-link').href = mode.editHref;
     $('#ready-title').textContent = mode.readyTitle;
@@ -238,8 +240,10 @@
   const namesList = $('#names-list');
   const setupError = $('#setup-error');
   const modeToggle = $('#btn-mode-toggle');
+  const modeSwitchLink = $('#btn-mode-switch-link');
 
   modeToggle.addEventListener('click', toggleMode);
+  modeSwitchLink.addEventListener('click', toggleMode);
   classicHintsInput.checked = state.classicHintsEnabled;
   classicHintsInput.addEventListener('change', () => {
     state.classicHintsEnabled = classicHintsInput.checked;

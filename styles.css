@@ -101,6 +101,25 @@ html, body {
   opacity: 0.7;
 }
 
+.mode-switch-link {
+  display: inline-block;
+  margin: 10px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5ce1ff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.mode-switch-link:hover,
+.mode-switch-link:focus-visible {
+  color: #7e5cff;
+}
+
 .footnote {
   text-align: center;
   font-size: 12px;
